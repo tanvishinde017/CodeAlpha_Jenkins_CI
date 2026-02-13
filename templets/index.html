@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <h1>Flask URL Shortener – Azure CI/CD</h1>
+
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Flask URL Shortener</h1>
+
+    <form method="POST">
+        <input type="url" name="original_url" placeholder="Enter long URL" required>
+        <button type="submit">Shorten</button>
+    </form>
+
+    {% if short_url %}
+        <p>Short URL:</p>
+        <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+    {% endif %}
+</body>
+</html>
