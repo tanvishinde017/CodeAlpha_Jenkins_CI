@@ -9,15 +9,28 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Build stage executed successfully!'
+                bat 'docker build -t flask-app .'
             }
         }
 
-        stage('Success Message') {
+        stage('Stop Old Container') {
             steps {
-                echo 'Pipeline executed successfully!'
+                bat 'docker stop flask-container || exit 0'
+                bat 'docker rm flask-container || exit 0'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                bat 'docker run -d -p 8000:8000 --name flask-container flask-app'
+            }
+        }
+
+        stage('Success') {
+            steps {
+                echo 'Application Deployed Successfully!'
             }
         }
     }

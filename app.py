@@ -8,10 +8,18 @@ app = Flask(__name__)
 
 URLS_FILE = "urls.json"
 
-# Create urls.json if not exists
-if not os.path.exists(URLS_FILE):
+def load_urls():
+    if not os.path.exists(URLS_FILE):
+        return {}
+    try:
+        with open(URLS_FILE, "r") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return {}
+
+def save_urls(urls):
     with open(URLS_FILE, "w") as f:
-        json.dump({}, f)
+        json.dump(urls, f)
 
 def generate_short_url():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=6))
@@ -23,14 +31,12 @@ def index():
     if request.method == "POST":
         original_url = request.form["original_url"]
 
-        with open(URLS_FILE, "r") as f:
-            urls = json.load(f)
+        urls = load_urls()
 
         short_code = generate_short_url()
         urls[short_code] = original_url
 
-        with open(URLS_FILE, "w") as f:
-            json.dump(urls, f)
+        save_urls(urls)
 
         short_url = request.host_url + short_code
 
@@ -38,12 +44,12 @@ def index():
 
 @app.route("/<short_code>")
 def redirect_url(short_code):
-    with open(URLS_FILE, "r") as f:
-        urls = json.load(f)
+    urls = load_urls()
 
     original_url = urls.get(short_code)
     if original_url:
         return redirect(original_url)
+
     return "URL not found", 404
 
 if __name__ == "__main__":
